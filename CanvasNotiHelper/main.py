@@ -21,6 +21,7 @@ app = customtkinter.CTk()
 app.title("Canvas Helped")
 app.geometry("518x293")
 app.grid_columnconfigure((0,1), weight=1)
+checkbox_vars = []
 
 b = "ITSC-3144"
 a = "Assignment 3"
@@ -107,6 +108,7 @@ def get_current_assignments():
         # print(i.get("course"))
         checkbox_1 = customtkinter.CTkCheckBox(app, text=(f"{i.get('course')} - {i.get('name')} - {i.get('due_date')}"))
         checkbox_1.grid(row=0, column=0, padx=20, pady=(0, 20), sticky="ew")
+      
          # call function that makes checkboxs
 
 
