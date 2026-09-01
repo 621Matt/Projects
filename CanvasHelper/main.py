@@ -7,7 +7,6 @@ import time
 from datetime import datetime
 from dotenv import load_dotenv 
 
-#load env reading module
 load_dotenv()
 token = os.getenv("CANVAS_TOKEN")
 url = os.getenv("CANVAS_URL")
@@ -36,9 +35,7 @@ class ScrollableCheckboxFrame(customtkinter.CTkScrollableFrame):
 
     def data_fetcher(self):
          time.sleep(2)
-
          data = get_current_assignments()
-
          self.after(0, self.checkbox_creator, data)
 
     def checkbox_creator(self, data):
@@ -72,29 +69,20 @@ class App(customtkinter.CTk):
         # Theme
         self.configure(
             fg_color="#D1D1D1"
-
         )
 
         # CheckBox Frame
         self.scrollable_checkbox_frame = ScrollableCheckboxFrame(self, title="Assignments")
         self.scrollable_checkbox_frame.grid(row=0, column=0, padx=10, pady=(10, 10), sticky="nsew")
 
-        # CheckBox Frame Theme
-        # self.scrollable_checkbox_frame.configure(
-        #      label_font=("Courier", 18, "bold")
-        # )
-
 # Gets assignments from canvas api and puts into list
 def get_current_assignments():
     # Assignments
     assignments = []
 
-
     #Requests courses and stores in json file
     course_request = requests.get(f"{url}/api/v1/courses", headers=header, params={"enrollment_state": "active"})
     courses = course_request.json()
-
-    # print(courses)
 
     for course in courses:
         course_id = course.get("id")
@@ -108,10 +96,7 @@ def get_current_assignments():
         course_assignments_request = requests.get(course_assignments_url, headers=header, params={"bucket":"upcoming"})
 
         if course_assignments_request.status_code == 200:
-            # print("yes")
-
             course_assignments = course_assignments_request.json()
-            # print(course_name)
 
             for i in course_assignments:
 
@@ -147,7 +132,6 @@ def get_current_assignments():
 def main():
     app = App()
     app.mainloop()
-
 
 if __name__ == "__main__":
     main()

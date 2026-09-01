@@ -26,9 +26,3 @@ Example of .env contents:
     CANVAS_TOKEN = your_token_here
 
 ### 3.Run main.py
-
-
-```bash
-git clone [https://github.com/your-username/CanvasHelper.git](https://github.com/your-username/CanvasHelper.git)
-
-
