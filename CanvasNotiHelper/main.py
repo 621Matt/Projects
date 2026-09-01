@@ -13,12 +13,6 @@ token = os.getenv("CANVAS_TOKEN")
 url = os.getenv("CANVAS_URL")
 header = {"Authorization": f"Bearer {token}"}
 
-# Create test variable of assignments
-# Create app screen
-# Create function that makes new checkboxes based on assignments
-# create function that checks for new assignments
-    # use threads to prevent freezing of UI
-
 class ScrollableCheckboxFrame(customtkinter.CTkScrollableFrame):
     def __init__(self, master, title):
         super().__init__(master, label_text=title)
@@ -62,7 +56,7 @@ class ScrollableCheckboxFrame(customtkinter.CTkScrollableFrame):
 
     def event(self, checkbox):
             if checkbox.get() == 1:
-                checkbox.configure(text="Assignment Complete!", text_color="green", font=("Courier", 12))
+                checkbox.configure(text="Assignment Complete!", text_color="green")
             else:
                 checkbox.configure(text=checkbox.original_text, text_color="white")
 
