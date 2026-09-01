@@ -2,6 +2,8 @@ import os
 import requests
 import customtkinter
 import re
+import threading
+import time
 from datetime import datetime
 from dotenv import load_dotenv 
 
@@ -17,31 +19,76 @@ header = {"Authorization": f"Bearer {token}"}
 # create function that checks for new assignments
     # use threads to prevent freezing of UI
 
-app = customtkinter.CTk()
-app.title("Canvas Helped")
-app.geometry("518x293")
-app.grid_columnconfigure((0,1), weight=1)
-checkbox_vars = []
+class ScrollableCheckboxFrame(customtkinter.CTkScrollableFrame):
+    def __init__(self, master, title):
+        super().__init__(master, label_text=title)
+        self.grid_columnconfigure(0, weight=1)
+        self.checkboxes = []
 
-b = "ITSC-3144"
-a = "Assignment 3"
-c = "Sept 05"
+        # Theme
+        self.configure(
+            scrollbar_button_color="#564D65",
+            label_fg_color="#564D65",
+            label_font = ("Courier", 18, "bold")
+        )
 
-# checkbox_1 = customtkinter.CTkCheckBox(app, text=(f"{a} - {b} - {c}"))
-# checkbox_1.grid(row=0, column=0, padx=20, pady=(0, 20), sticky="ew")
+        # Temp loading message
+        self.loading_label = customtkinter.CTkLabel(self, text="Loading Assignments...")
+        self.loading_label.grid(row=0, column=0, pady=20)
 
-# app.mainloop()
-
-
-
-
-
-
-
+        # Start checkbox creation
+        threading.Thread(target=self.data_fetcher, daemon=True).start()
 
 
+    def data_fetcher(self):
+         time.sleep(2)
 
+         data = get_current_assignments()
 
+         self.after(0, self.checkbox_creator, data)
+
+    def checkbox_creator(self, data):
+        self.loading_label.destroy()
+
+        for row, i in enumerate(data):
+                    text = f"{i.get('name')} - {i.get('course')} - {i.get('due_date')}"
+                    checkbox = customtkinter.CTkCheckBox(self, text=text, corner_radius=11, hover_color="#564D65")
+                    checkbox.original_text = text
+                    checkbox.configure(command=lambda cb=checkbox: self.event(cb))
+        
+                    checkbox.grid(row=row, column=0, padx=10, pady=(10, 0), sticky="w")
+                    self.checkboxes.append(checkbox)
+     
+
+    def event(self, checkbox):
+            if checkbox.get() == 1:
+                checkbox.configure(text="Assignment Complete!", text_color="green", font=("Courier", 12))
+            else:
+                checkbox.configure(text=checkbox.original_text, text_color="white")
+
+class App(customtkinter.CTk):
+    def __init__(self):
+        super().__init__()
+        self.title("Canvas Helper")
+        self.geometry("500x400")
+        self.grid_columnconfigure(0, weight=1)
+        self.grid_rowconfigure(0, weight=1)
+        self.resizable(False,False)
+
+        # Theme
+        self.configure(
+            fg_color="#D1D1D1"
+
+        )
+
+        # CheckBox Frame
+        self.scrollable_checkbox_frame = ScrollableCheckboxFrame(self, title="Assignments")
+        self.scrollable_checkbox_frame.grid(row=0, column=0, padx=10, pady=(10, 10), sticky="nsew")
+
+        # CheckBox Frame Theme
+        # self.scrollable_checkbox_frame.configure(
+        #      label_font=("Courier", 18, "bold")
+        # )
 
 # Gets assignments from canvas api and puts into list
 def get_current_assignments():
@@ -100,18 +147,13 @@ def get_current_assignments():
                 }
 
                 assignments.append(assignment)
-               
+    return assignments
 
-# didnt wirk on printed last assignment
-# probs cuz screen wasnt updating idk
-    for i in assignments:
-        # print(i.get("course"))
-        checkbox_1 = customtkinter.CTkCheckBox(app, text=(f"{i.get('course')} - {i.get('name')} - {i.get('due_date')}"))
-        checkbox_1.grid(row=0, column=0, padx=20, pady=(0, 20), sticky="ew")
-      
-         # call function that makes checkboxs
+# Main Function
+def main():
+    app = App()
+    app.mainloop()
 
 
-#Step 3:
-get_current_assignments()
-app.mainloop()
+if __name__ == "__main__":
+    main()
